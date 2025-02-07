@@ -256,7 +256,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     self.state = RNSnackBarViewStateDismissing;
     [UIView animateWithDuration:ANIMATION_DURATION
         animations:^{
-          self.transform = CGAffineTransformMakeTranslation(0, -getSafeAreaTopPadding()-48);
+          self.transform = CGAffineTransformMakeTranslation(0, -[self getSafeAreaTopPadding]-48);
           self.alpha = 0;
         }
         completion:^(BOOL finished) {
