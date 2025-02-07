@@ -63,14 +63,26 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     [snackBar dismiss];
 }
 
+
+- (CGFloat)getSafeAreaTopPadding {
+    if (@available(iOS 11.0, *)) {
+        UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+        return keyWindow.safeAreaInsets.top;
+    } else {
+        return 20.0;
+    }
+}
+
 - (instancetype)init {
-    self = [super initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 48,
-                                           [UIScreen mainScreen].bounds.size.width, 48)];
+    CGFloat topPadding = [self getSafeAreaTopPadding];
+    self = [super initWithFrame:CGRectMake(0, 0,
+                                           [UIScreen mainScreen].bounds.size.width, 48 + topPadding)];
     if (self) {
         [self buildView];
     }
     return self;
 }
+
 
 - (void)buildView {
     self.backgroundColor = [UIColor colorWithRed:0.196078F
@@ -85,6 +97,11 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     textLabel.textColor = _textColor;
     textLabel.font = [UIFont boldSystemFontOfSize:14];
     [textLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    CGFloat topPadding = [self getSafeAreaTopPadding];
+    [NSLayoutConstraint activateConstraints:@[
+        [textLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:topPadding]
+    ]
     [self addSubview:textLabel];
 
     actionButton = [UIButton new];
@@ -240,7 +257,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     self.state = RNSnackBarViewStateDismissing;
     [UIView animateWithDuration:ANIMATION_DURATION
         animations:^{
-          self.transform = CGAffineTransformMakeTranslation(0, [self.marginBottom integerValue] == 0 ? self.bounds.size.height : 0);
+          self.transform = CGAffineTransformMakeTranslation(0, -getSafeAreaTopPadding()-48);
           self.alpha = 0;
         }
         completion:^(BOOL finished) {
