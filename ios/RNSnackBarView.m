@@ -63,7 +63,6 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     [snackBar dismiss];
 }
 
-
 - (CGFloat)getSafeAreaTopPadding {
     if (@available(iOS 11.0, *)) {
         UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
@@ -90,7 +89,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
                                             blue:0.196078F
                                            alpha:1.0F];
     self.accessibilityIdentifier = @"snackbar";
-
+    
     textLabel = [UILabel new];
     textLabel.text = _text;
     textLabel.numberOfLines = 2;
@@ -100,8 +99,8 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     
     CGFloat topPadding = [self getSafeAreaTopPadding];
     [NSLayoutConstraint activateConstraints:@[
-        [textLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:topPadding]
-    ]
+        [textLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:topPadding]
+    ]];
     [self addSubview:textLabel];
 
     actionButton = [UIButton new];
