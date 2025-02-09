@@ -96,11 +96,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     textLabel.textColor = _textColor;
     textLabel.font = [UIFont boldSystemFontOfSize:14];
     [textLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
-    
-    CGFloat topPadding = [self getSafeAreaTopPadding];
-    [NSLayoutConstraint activateConstraints:@[
-        [textLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:topPadding]
-    ]];
+
     [self addSubview:textLabel];
 
     actionButton = [UIButton new];
@@ -188,38 +184,35 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     [self setTranslatesAutoresizingMaskIntoConstraints:false];
     
     // Set vertical padding
-    CGFloat topPadding = 14;
-    CGFloat bottomPadding = topPadding;
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = [[UIApplication sharedApplication] delegate].window;
-
-        // If no bottom margin, increase bottom padding to size of safe area inset
-        if ([self.marginBottom integerValue] == 0 && window.safeAreaInsets.bottom > bottomPadding)
-            bottomPadding = window.safeAreaInsets.bottom;
-    }
+    CGFloat topPadding = 14 + [self getSafeAreaTopPadding];
+    CGFloat bottomPadding = 14;
     NSLog([NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding,
            bottomPadding]);
     if (self.verticalPaddingConstraints) // Remove old constraints
         [self removeConstraints:self.verticalPaddingConstraints];
+
+
     self.verticalPaddingConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding,
                                                                      bottomPadding]
                                                                             options:0
                                                                             metrics:nil
                                                                               views:@{@"textLabel" : textLabel}];
     [self addConstraints:self.verticalPaddingConstraints];
-
-    // Set margins
-    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[self(>=48)]-%@-|", self.marginBottom]
-                                                                      options:0
-                                                                      metrics:nil
-                                                                        views:@{@"self" : self}]];
+    
+    CGFloat minHeight = 48 + [self getSafeAreaTopPadding]; // View height with safe area
+    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[self(>=%.2f)]", minHeight]
+                                                                    options:0
+                                                                    metrics:nil
+                                                                      views:@{@"self" : self}]];
     [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]|"
                                                                       options:0
                                                                       metrics:nil
                                                                         views:@{@"self" : self}]];
 
     // Snackbar will slide up from bottom, unless a bottom margin is set in which case we use a fade animation
-    self.transform = CGAffineTransformMakeTranslation(0, [self.marginBottom integerValue] == 0 ? self.bounds.size.height : 0);
+    // self.transform = CGAffineTransformMakeTranslation(0, [self.marginBottom integerValue] == 0 ? self.bounds.size.height : 0);
+    self.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height);
+
     textLabel.alpha = 0;
     actionButton.alpha = 0;
     if ([self.marginBottom integerValue] == 0) {
